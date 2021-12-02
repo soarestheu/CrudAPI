@@ -69,7 +69,7 @@ class UserController extends Controller
             $data = $request->only(['name', 'email']);
             $user = User::where('id', $id)->update($data);
     
-            if( User::find($id)->update($data) ){
+            if($user){
                 return response()->json(["sucess" => "Usuário atualizado com sucesso"]);
             }else{
                 return response()->json(["error" => "Erro ao atualizar usuário"]);
