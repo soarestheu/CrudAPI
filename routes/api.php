@@ -19,13 +19,11 @@ Route::group(['prefix' => 'base'], function(){
         return response()->json(["status" => "Online"]);
     });
     
-    Route::get('/users', "UserController@index");
     Route::post('auth/login', 'AuthController@login');
-
+    
     Route::group(['middleware' => ['apiJwt']], function(){
-
+        Route::get('me', "AuthController@me");
         Route::resource("user", "UserController");
         Route::post('auth/logout', 'AuthController@logout');
-
     });
 });
