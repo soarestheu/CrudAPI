@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\User;
 
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use App\Exceptions\BusinessException;
+
 
 class AuthController extends Controller
 {
@@ -21,14 +24,22 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         // $credentials = $request->only(['email', 'password']);
-        $user = new User;
-        $user->email = $request->email;
-        $user->password = hash::make($request->password );
-        if (! $token = auth('api')->login($user)) {
-            return response()->json(['error' => $request->email], 401);
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
+        // dd($user);
+
+        if (! $token = auth('api')->attempt($credentials)) {
+            return response()->json(['error' => "Erro no login."], 401);
         }
 
         return $this->respondWithToken($token);
+    }
+
+    public function me()
+    {
+        return response()->json(auth()->user());
     }
 
      /**
@@ -56,7 +67,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
+            'expires_in' => auth('api')->factory()->getTTL() * 2
         ]);
     }
 }
